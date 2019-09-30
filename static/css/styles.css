@@ -1,0 +1,101 @@
+body {
+    background-color: rgba(220, 220, 220, 0);
+}
+
+h1 {
+    color: blue;
+}
+
+table, th {
+
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+td {
+    text-align: right;
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+.MainView {
+    height: 100%;
+    border: 1px solid #060606;
+    margin-top: 40px;
+}
+
+.TopView {
+    height: 25%;
+    border: 1px solid #050505;
+    flex-direction: row;
+    display: flex;
+}
+
+.TopViewText {
+    margin-left: 75%;
+    font-size: 1.5vw;
+    font-weight: bold;
+}
+
+.ContentView {
+    padding: 10px;
+    justify-content: space-around;
+    border: 1px solid #000000;
+    display: flex;
+
+}
+
+.JobView {
+    width: 70%;
+    border: 1px solid #040404;
+
+}
+
+.JobsBoxView {
+    display: flex;
+    margin-right: 0;
+    flex-direction: column;
+    width: 25%;
+    border: 1px solid #040404;
+    padding: 10px;
+}
+
+.JobsBoxViewText {
+    text-align: right;
+    margin-right: 10px;
+    width: 350px;
+    height: 20px;
+    font-size: 19px;
+}
+
+.JobsBoxViewButtonView {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+
+
+}
+
+.JobsBoxViewButton {
+    width: 200px;
+    border-radius: 8px;
+    background-color: #ffeb3b;
+    font-size: 19px;
+
+}
+
+.JobsBoxViewScroll {
+    width: 350px;
+    height: 430px;
+    overflow: auto;
+    display: flex;
+
+}
+
+.InputView {
+    margin-top: 48%;
+    width: 99.5%;
+    text-align: right;
+
+
+}

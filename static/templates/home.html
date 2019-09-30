@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <meta charset="UTF-8">
+    <title>Home Page</title>
+</head>
+<body>
+<div class="MainView">
+    <div class="TopView">
+        <img src="{% static "image/Logo.PNG" %}" alt="animal">
+        <p class="TopViewText">
+            سامانه ثبت ساعت شرکت عرش
+        </p>
+    </div>
+
+    <div class="ContentView">
+        <div class="JobView">
+            <table style="width:100%">
+                <tr>
+                    <th>مدت زمان</th>
+                    <th>پایان</th>
+                    <th>شروع</th>
+                    <th>عنوان کار</th>
+                </tr>
+                <tr>
+                    <td>1 ساعت</td>
+                    <td>10:10</td>
+                    <td>09:10</td>
+                    <td>خواندن داک جنگو</td>
+                </tr>
+
+            </table>
+            <input class="InputView"  type="text"
+                   placeholder ="کار جدید را وارد کنید">
+        </div>
+
+        <div class="JobsBoxView">
+
+            <p class="JobsBoxViewText">
+                بسته های کاری
+            </p>
+            <div class="JobsBoxViewScroll">
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+                hello world!<br>
+
+
+            </div>
+            <div class="JobsBoxViewButtonView">
+                <button class="JobsBoxViewButton" type="submit">ایجاد بسته کاری جدید</button>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+</html>
