@@ -89,7 +89,7 @@ td {
     height: 430px;
     overflow: auto;
     display: flex;
-
+text-align: right;
 }
 
 .InputView {
