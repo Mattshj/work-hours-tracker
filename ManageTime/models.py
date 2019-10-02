@@ -3,7 +3,7 @@ from django.db import models
 
 class JobBox(models.Model):
     title = models.CharField(max_length=120)
-    initialTime = models.DateTimeField()
+    initial_time = models.DateTimeField()
 
 
 class Job(models.Model):

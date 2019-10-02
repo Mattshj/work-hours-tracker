@@ -18,12 +18,14 @@
                         <th>شروع</th>
                         <th>عنوان کار</th>
                     </tr>
+
                     {% for job in jobs %}
                         <tr>
-                            <td>{{ job.InitialTime }}</td>{#duration will be placed        #}
-                            <td>{{ job.InitialTime }}</td>
-                            <td>{{ job.FinishTime }}</td>
-                            <td>{{ job.Title }}</td>
+                            <td>{{ job.initial_time }}</td>
+                            {#duration will be placed        #}
+                            <td>{{ job.finish_time }}</td>
+                            <td>{{ job.finish_time }}</td>
+                            <td>{{ job.title }}</td>
                         </tr>
                     {% endfor %}
 
@@ -39,16 +41,15 @@
                     بسته های کاری
                 </p>
                 <div class="JobsBoxViewScroll">
-                    {% for box in jobsbox %}
-                         <p>
-                        {{ box.InitialTime }}
-                        </p>
-                        <p style="text-align: right; width: 100%;height: 100%;display: flex;">
-                            {{ box.Title }}
-                        </p>
+                    {% for box in jobs_box %}
+
+                        <button class="JobBoxButton">
+                            <a href="/{{ box.pk }}">{{ box.initial_time }} {{ box.title }} </a>
+
+                            {#                            {{ box.initialTime }}#}
+                        </button>
 
                     {% endfor %}
-
 
                 </div>
                 <div class="JobsBoxViewButtonView">

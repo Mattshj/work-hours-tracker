@@ -16,8 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from ManageTime import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('',views.home),
+    path('<box_id>/', views.home1),
+    path('', views.home),
     # path('login',View.login)
 ]
