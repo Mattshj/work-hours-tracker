@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from polls.models import Job, JobBox
+from ManageTime.models import Job, JobBox
 
 
 def home(request):

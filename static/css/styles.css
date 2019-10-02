@@ -90,12 +90,13 @@ td {
     overflow: auto;
     display: flex;
 text-align: right;
+
 }
 
 .InputView {
-    margin-top: 48%;
+    margin-top: 46%;
     width: 99.5%;
     text-align: right;
-    height: 10px;
+    height: 10%;
 
 }

@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('polls', '0002_auto_20190928_1341'),
+        ('ManageTime', '0002_auto_20190928_1341'),
     ]
 
     operations = [

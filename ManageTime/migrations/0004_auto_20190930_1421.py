@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('polls', '0003_job_jobbox_user'),
+        ('ManageTime', '0003_job_jobbox_user'),
     ]
 
     operations = [
