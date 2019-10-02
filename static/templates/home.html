@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+    <div class="MainView">
+        <div class="TopView">
+            <img src="{% static "image/Logo.PNG" %}" alt="animal">
+            <p class="TopViewText">
+                سامانه ثبت ساعت شرکت عرش
+            </p>
+        </div>
+
+        <div class="ContentView">
+            <div class="JobView">
+                <table style="width:100%">
+                    <tr>
+                        <th>مدت زمان</th>
+                        <th>پایان</th>
+                        <th>شروع</th>
+                        <th>عنوان کار</th>
+                    </tr>
+                    {% for job in jobs %}
+                        <tr>
+                            <td>{{ job.InitialTime }}</td>{#duration will be placed        #}
+                            <td>{{ job.InitialTime }}</td>
+                            <td>{{ job.FinishTime }}</td>
+                            <td>{{ job.Title }}</td>
+                        </tr>
+                    {% endfor %}
+
+
+                </table>
+                <input class="InputView" type="text"
+                       placeholder="کار جدید را وارد کنید"/>
+            </div>
+
+            <div class="JobsBoxView">
+
+                <p class="JobsBoxViewText">
+                    بسته های کاری
+                </p>
+                <div class="JobsBoxViewScroll">
+                    {% for box in jobsbox %}
+                         <p>
+                        {{ box.InitialTime }}
+                        </p>
+                        <p style="text-align: right; width: 100%;height: 100%;display: flex;">
+                            {{ box.Title }}
+                        </p>
+
+                    {% endfor %}
+
+
+                </div>
+                <div class="JobsBoxViewButtonView">
+                    <button class="JobsBoxViewButton" type="submit">ایجاد بسته کاری جدید</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+{% endblock %}
