@@ -1,0 +1,46 @@
+# Django Web Framework
+Django>=4.2.0,<5.0.0
+
+# Database
+# SQLite is included with Python, but you can add other database drivers here
+# psycopg2-binary>=2.9.0  # For PostgreSQL
+# mysqlclient>=2.1.0      # For MySQL
+
+# Development and Testing
+pytest>=7.0.0
+pytest-django>=4.5.0
+coverage>=7.0.0
+black>=23.0.0
+flake8>=6.0.0
+isort>=5.12.0
+
+# Production
+gunicorn>=21.0.0
+whitenoise>=6.5.0
+
+# Environment Management
+python-decouple>=3.8
+
+# Date/Time Utilities
+python-dateutil>=2.8.0
+
+# Security
+django-cors-headers>=4.0.0
+
+# Optional: For enhanced admin interface
+django-admin-interface>=0.25.0
+
+# Optional: For better form rendering
+django-crispy-forms>=2.0
+crispy-bootstrap5>=0.7
+
+# Optional: For API development
+djangorestframework>=3.14.0
+django-filter>=23.0
+
+# Optional: For background tasks
+celery>=5.3.0
+redis>=4.5.0
+
+# Optional: For monitoring
+sentry-sdk[django]>=1.30.0

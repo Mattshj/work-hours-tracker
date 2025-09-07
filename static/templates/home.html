@@ -1,63 +1,208 @@
 {% extends 'base.html' %}
 {% load static %}
+
+{% block title %}Dashboard - Work Hours Tracker{% endblock %}
+
 {% block content %}
-    <div class="MainView">
-        <div class="TopView">
-            <img src="{% static "image/Logo.PNG" %}" alt="animal">
-            <p class="TopViewText">
-                سامانه ثبت ساعت شرکت عرش
-            </p>
+<div class="dashboard-container">
+    <!-- Statistics Section -->
+    <section class="stats-section" aria-labelledby="stats-heading">
+        <h2 id="stats-heading" class="section-title">Overview</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">{{ total_jobs }}</div>
+                <div class="stat-label">Total Jobs</div>
+            </div>
+            <div class="stat-card active">
+                <div class="stat-number">{{ active_jobs }}</div>
+                <div class="stat-label">Active Jobs</div>
+            </div>
+            <div class="stat-card completed">
+                <div class="stat-number">{{ completed_jobs }}</div>
+                <div class="stat-label">Completed Jobs</div>
+            </div>
         </div>
+    </section>
 
-        <div class="ContentView">
-            <div class="JobView">
-                <table style="width:100%">
-                    <tr>
-                        <th>مدت زمان</th>
-                        <th>پایان</th>
-                        <th>شروع</th>
-                        <th>عنوان کار</th>
-                    </tr>
-                    {% for job in jobs %}
-                        <tr>
-                            <td>{{ job.InitialTime }}</td>{#duration will be placed        #}
-                            <td>{{ job.InitialTime }}</td>
-                            <td>{{ job.FinishTime }}</td>
-                            <td>{{ job.Title }}</td>
-                        </tr>
-                    {% endfor %}
-
-
-                </table>
-                <input class="InputView" type="text"
-                       placeholder="کار جدید را وارد کنید"/>
+    <div class="main-dashboard">
+        <!-- Jobs Section -->
+        <section class="jobs-section" aria-labelledby="jobs-heading">
+            <div class="section-header">
+                <h2 id="jobs-heading" class="section-title">Recent Jobs</h2>
+                <a href="{% url 'managetime:job_create' %}" class="btn btn-primary" role="button">
+                    Add New Job
+                </a>
             </div>
 
-            <div class="JobsBoxView">
-
-                <p class="JobsBoxViewText">
-                    بسته های کاری
-                </p>
-                <div class="JobsBoxViewScroll">
-                    {% for box in jobsbox %}
-                         <p>
-                        {{ box.InitialTime }}
-                        </p>
-                        <p style="text-align: right; width: 100%;height: 100%;display: flex;">
-                            {{ box.Title }}
-                        </p>
-
+            {% if jobs %}
+                <div class="table-container">
+                    <table class="jobs-table" role="table" aria-label="Recent jobs">
+                        <thead>
+                            <tr role="row">
+                                <th scope="col" role="columnheader">Job Title</th>
+                                <th scope="col" role="columnheader">Start Time</th>
+                                <th scope="col" role="columnheader">End Time</th>
+                                <th scope="col" role="columnheader">Duration</th>
+                                <th scope="col" role="columnheader">Package</th>
+                                <th scope="col" role="columnheader">Status</th>
+                                <th scope="col" role="columnheader">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                                <tr role="row" class="{% if not job.end_time %}active-job{% endif %}">
+                                    <td role="cell">
+                                        <a href="{% url 'managetime:job_detail' job.id %}" class="job-title-link">
+                                            {{ job.title }}
+                                        </a>
+                                    </td>
+                                    <td role="cell">{{ job.start_time|date:"M d, Y H:i" }}</td>
+                                    <td role="cell">
+                                        {% if job.end_time %}
+                                            {{ job.end_time|date:"M d, Y H:i" }}
+                                        {% else %}
+                                            <span class="ongoing">Ongoing</span>
+                                        {% endif %}
+                                    </td>
+                                    <td role="cell">
+                                        <span class="duration">
+                                            {% if job.duration %}
+                                                {{ job.duration|floatformat:0 }}h
+                                            {% else %}
+                                                -
+                                            {% endif %}
+                                        </span>
+                                    </td>
+                                    <td role="cell">
+                                        {% if job.job_box %}
+                                            <a href="{% url 'managetime:package_detail' job.job_box.id %}" class="package-link">
+                                                {{ job.job_box.title }}
+                                            </a>
+                                        {% else %}
+                                            <span class="no-package">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td role="cell">
+                                        <span class="status-badge {% if job.is_completed %}completed{% else %}active{% endif %}">
+                                            {% if job.is_completed %}Completed{% else %}Active{% endif %}
+                                        </span>
+                                    </td>
+                                    <td role="cell" class="actions">
+                                        {% if not job.end_time %}
+                                            <button class="btn btn-sm btn-stop" 
+                                                    onclick="stopJob({{ job.id }})"
+                                                    aria-label="Stop job {{ job.title }}">
+                                                Stop
+                                            </button>
+                                        {% endif %}
+                                        <a href="{% url 'managetime:job_edit' job.id %}" 
+                                           class="btn btn-sm btn-edit" 
+                                           aria-label="Edit job {{ job.title }}">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
                     {% endfor %}
-
-
+                        </tbody>
+                    </table>
                 </div>
-                <div class="JobsBoxViewButtonView">
-                    <button class="JobsBoxViewButton" type="submit">ایجاد بسته کاری جدید</button>
+            {% else %}
+                <div class="empty-state">
+                    <p>No jobs found. <a href="{% url 'managetime:job_create' %}">Create your first job</a> to get started!</p>
                 </div>
+            {% endif %}
+        </section>
 
+        <!-- Quick Actions & Job Packages -->
+        <aside class="sidebar" role="complementary">
+            <!-- Quick Start Job -->
+            <section class="quick-actions" aria-labelledby="quick-actions-heading">
+                <h3 id="quick-actions-heading" class="sidebar-title">Quick Start</h3>
+                <form method="post" action="{% url 'managetime:quick_start_job' %}" class="quick-job-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="{{ quick_job_form.title.id_for_label }}" class="form-label">
+                            {{ quick_job_form.title.label }}
+                        </label>
+                        {{ quick_job_form.title }}
+                        {% if quick_job_form.title.errors %}
+                            <div class="form-errors">
+                                {% for error in quick_job_form.title.errors %}
+                                    <span class="error">{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="form-group">
+                        <label for="{{ quick_job_form.job_box.id_for_label }}" class="form-label">
+                            {{ quick_job_form.job_box.label }}
+                        </label>
+                        {{ quick_job_form.job_box }}
             </div>
+                    <button type="submit" class="btn btn-primary btn-block">Start Job</button>
+                </form>
+            </section>
 
+            <!-- Job Packages -->
+            <section class="job-packages" aria-labelledby="packages-heading">
+                <div class="section-header">
+                    <h3 id="packages-heading" class="sidebar-title">Job Packages</h3>
+                    <a href="{% url 'managetime:package_create' %}" class="btn btn-sm btn-secondary" role="button">
+                        New Package
+                    </a>
         </div>
 
+                {% if job_packages %}
+                    <div class="packages-list">
+                        {% for package in job_packages %}
+                            <div class="package-item">
+                                <a href="{% url 'managetime:package_detail' package.id %}" class="package-link">
+                                    <h4 class="package-title">{{ package.title }}</h4>
+                                    <p class="package-meta">
+                                        Created {{ package.created_at|date:"M d, Y" }}
+                                    </p>
+                                    <p class="package-duration">
+                                        Total: {{ package.total_duration|floatformat:0 }}h
+                                    </p>
+                                </a>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <div class="empty-state">
+                        <p>No job packages yet. <a href="{% url 'managetime:package_create' %}">Create one</a> to organize your work!</p>
+                    </div>
+                {% endif %}
+            </section>
+        </aside>
     </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function stopJob(jobId) {
+    if (confirm('Are you sure you want to stop this job?')) {
+        fetch(`/api/job/${jobId}/stop/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error stopping job: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while stopping the job.');
+        });
+    }
+}
+</script>
 {% endblock %}

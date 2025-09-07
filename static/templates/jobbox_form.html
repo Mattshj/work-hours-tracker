@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Job Package - Work Hours Tracker{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h1 class="form-title">Create New Job Package</h1>
+        <a href="{% url 'managetime:home' %}" class="btn btn-secondary">Back to Dashboard</a>
+    </div>
+
+    <form method="post" class="jobbox-form">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}" class="form-label">
+                {{ form.title.label }}
+            </label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="form-errors">
+                    {% for error in form.title.errors %}
+                        <span class="error">{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Create Package</button>
+            <a href="{% url 'managetime:home' %}" class="btn btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}
