@@ -4,13 +4,32 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize all components
-    initializeAlerts();
-    initializeForms();
-    initializeQuickActions();
-    initializeTooltips();
-    initializeSearch();
-    initializeAnimations();
+    console.log('DOM loaded, initializing components...');
+    
+    try {
+        // Initialize all components
+        initializeAlerts();
+        console.log('✓ Alerts initialized');
+        
+        initializeForms();
+        console.log('✓ Forms initialized');
+        
+        initializeQuickActions();
+        console.log('✓ Quick actions initialized');
+        
+        initializeTooltips();
+        console.log('✓ Tooltips initialized');
+        
+        initializeSearch();
+        console.log('✓ Search initialized');
+        
+        initializeAnimations();
+        console.log('✓ Animations initialized');
+        
+        console.log('All components initialized successfully');
+    } catch (error) {
+        console.error('Error initializing components:', error);
+    }
 });
 
 /**
@@ -388,54 +407,106 @@ function throttle(func, limit) {
  * Initialize search functionality
  */
 function initializeSearch() {
-    const searchInput = document.getElementById('job-search');
-    const searchClear = document.getElementById('search-clear');
-    const jobsTable = document.querySelector('.jobs-table tbody');
+    console.log('Starting search initialization...');
     
-    if (!searchInput || !jobsTable) return;
-    
-    // Search functionality
-    searchInput.addEventListener('input', debounce(function() {
-        const searchTerm = this.value.toLowerCase().trim();
-        const rows = jobsTable.querySelectorAll('tr');
+    // Wait a bit for DOM to be fully ready
+    setTimeout(function() {
+        const searchInput = document.getElementById('job-search');
+        const searchClear = document.getElementById('search-clear');
+        const jobsTable = document.querySelector('.jobs-table tbody');
         
-        let visibleCount = 0;
-        
-        rows.forEach(row => {
-            const jobTitle = row.querySelector('.job-title-link')?.textContent.toLowerCase() || '';
-            const packageName = row.querySelector('.package-link')?.textContent.toLowerCase() || '';
-            const status = row.querySelector('.status-badge')?.textContent.toLowerCase() || '';
-            
-            const matches = jobTitle.includes(searchTerm) || 
-                          packageName.includes(searchTerm) || 
-                          status.includes(searchTerm);
-            
-            if (matches || searchTerm === '') {
-                row.style.display = '';
-                row.classList.add('fade-in');
-                visibleCount++;
-            } else {
-                row.style.display = 'none';
-            }
+        console.log('Search elements found:', {
+            searchInput: !!searchInput,
+            searchClear: !!searchClear,
+            jobsTable: !!jobsTable
         });
         
-        // Show/hide clear button
-        if (searchTerm) {
-            searchClear.style.display = 'block';
-        } else {
-            searchClear.style.display = 'none';
+        if (!searchInput) {
+            console.log('Search initialization failed - search input not found');
+            return;
         }
         
-        // Show no results message if needed
-        showNoResultsMessage(visibleCount === 0 && searchTerm !== '');
-    }, 300));
-    
-    // Clear search
-    searchClear.addEventListener('click', function() {
-        searchInput.value = '';
-        searchInput.dispatchEvent(new Event('input'));
-        searchInput.focus();
-    });
+        if (!jobsTable) {
+            console.log('Search initialization failed - jobs table not found');
+            return;
+        }
+        
+        console.log('Search initialization successful');
+        
+        // Simple search function without debounce for testing
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const rows = jobsTable.querySelectorAll('tr');
+            
+            console.log('Search triggered:', searchTerm, 'Rows found:', rows.length);
+            
+            let visibleCount = 0;
+            
+            rows.forEach((row, index) => {
+                const jobTitle = row.querySelector('.job-title-link');
+                const packageName = row.querySelector('.package-link');
+                const status = row.querySelector('.status-badge');
+                
+                const jobTitleText = jobTitle ? jobTitle.textContent.toLowerCase() : '';
+                const packageNameText = packageName ? packageName.textContent.toLowerCase() : '';
+                const statusText = status ? status.textContent.toLowerCase() : '';
+                
+                console.log(`Row ${index}:`, {
+                    jobTitle: jobTitleText,
+                    packageName: packageNameText,
+                    status: statusText,
+                    searchTerm: searchTerm
+                });
+                
+                const matches = jobTitleText.includes(searchTerm) || 
+                              packageNameText.includes(searchTerm) || 
+                              statusText.includes(searchTerm);
+                
+                if (matches || searchTerm === '') {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            // Show/hide clear button
+            if (searchClear) {
+                if (searchTerm) {
+                    searchClear.style.display = 'block';
+                } else {
+                    searchClear.style.display = 'none';
+                }
+            }
+            
+            console.log('Visible count after search:', visibleCount);
+        }
+        
+        // Add event listeners
+        searchInput.addEventListener('input', performSearch);
+        searchInput.addEventListener('keyup', performSearch);
+        
+        if (searchClear) {
+            searchClear.addEventListener('click', function() {
+                searchInput.value = '';
+                performSearch();
+                searchInput.focus();
+            });
+        }
+        
+        console.log('Search event listeners added');
+        
+        // Add test button functionality
+        const testButton = document.getElementById('test-search');
+        if (testButton) {
+            testButton.addEventListener('click', function() {
+                console.log('Test search button clicked');
+                searchInput.value = 'test';
+                performSearch();
+            });
+        }
+        
+    }, 100); // Small delay to ensure DOM is ready
 }
 
 /**
@@ -531,6 +602,33 @@ function stopJob(jobId) {
     });
 }
 
+// Fallback search function
+function fallbackSearch() {
+    console.log('Fallback search function called');
+    const searchInput = document.getElementById('job-search');
+    const jobsTable = document.querySelector('.jobs-table tbody');
+    
+    if (!searchInput || !jobsTable) {
+        console.log('Fallback search failed - elements not found');
+        return;
+    }
+    
+    const searchTerm = searchInput.value.toLowerCase().trim();
+    const rows = jobsTable.querySelectorAll('tr');
+    
+    console.log('Fallback search:', searchTerm, 'Rows:', rows.length);
+    
+    rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        if (text.includes(searchTerm) || searchTerm === '') {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
 // Export functions for global use
 window.stopJob = stopJob;
 window.showNotification = showNotification;
+window.fallbackSearch = fallbackSearch;

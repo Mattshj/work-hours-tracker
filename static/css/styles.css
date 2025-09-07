@@ -259,6 +259,9 @@ body {
     background: var(--white);
     transition: all var(--transition-fast);
     min-width: 200px;
+    display: block;
+    visibility: visible;
+    opacity: 1;
 }
 
 .search-input:focus {

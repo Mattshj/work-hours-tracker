@@ -32,7 +32,7 @@
                 <h2 id="jobs-heading" class="section-title">Recent Jobs</h2>
                 <div class="section-actions">
                     <div class="search-container">
-                        <input type="text" id="job-search" class="search-input" placeholder="Search jobs..." aria-label="Search jobs">
+                        <input type="text" id="job-search" class="search-input" placeholder="Search jobs..." aria-label="Search jobs" oninput="fallbackSearch()" onkeyup="fallbackSearch()">
                         <button type="button" class="search-clear" id="search-clear" aria-label="Clear search" style="display: none;">&times;</button>
                     </div>
                     <a href="{% url 'managetime:job_create' %}" class="btn btn-primary" role="button">
