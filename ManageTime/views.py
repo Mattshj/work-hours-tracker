@@ -46,7 +46,7 @@ class JobCreateView(CreateView):
     model = Job
     form_class = JobForm
     template_name = 'job_form.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('managetime:home')
 
     def form_valid(self, form):
         """Handle successful form submission."""
@@ -65,7 +65,7 @@ class JobUpdateView(UpdateView):
     model = Job
     form_class = JobForm
     template_name = 'job_form.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('managetime:home')
 
     def form_valid(self, form):
         """Handle successful form submission."""
@@ -77,7 +77,7 @@ class JobDeleteView(DeleteView):
     """View for deleting jobs."""
     
     model = Job
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('managetime:home')
 
     def delete(self, request, *args, **kwargs):
         """Handle job deletion."""
@@ -91,7 +91,7 @@ class JobBoxCreateView(CreateView):
     model = JobBox
     form_class = JobBoxForm
     template_name = 'jobbox_form.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('managetime:home')
 
     def form_valid(self, form):
         """Handle successful form submission."""

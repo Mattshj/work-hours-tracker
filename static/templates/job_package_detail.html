@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load duration_filters %}
+
+{% block title %}{{ package.title }} - Package Details{% endblock %}
+
+{% block content %}
+<div class="package-detail-container">
+    <div class="package-header">
+        <div class="package-title-section">
+            <h1 class="package-title">{{ package.title }}</h1>
+            <div class="package-meta">
+                <span class="package-created">Created {{ package.created_at|date:"M d, Y" }}</span>
+                <span class="package-duration">Total: {{ package.total_duration|format_duration }}</span>
+            </div>
+        </div>
+        <div class="package-actions">
+            <a href="{% url 'managetime:package_create' %}" class="btn btn-primary">
+                Create New Package
+            </a>
+            <a href="{% url 'managetime:home' %}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="package-stats">
+        <div class="stat-card">
+            <div class="stat-number">{{ jobs.count }}</div>
+            <div class="stat-label">Total Jobs</div>
+        </div>
+        <div class="stat-card active">
+            <div class="stat-number">{{ jobs|length|add:"-1"|add:"1" }}</div>
+            <div class="stat-label">Active Jobs</div>
+        </div>
+        <div class="stat-card completed">
+            <div class="stat-number">{{ jobs|length|add:"-1"|add:"1" }}</div>
+            <div class="stat-label">Completed Jobs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">{{ package.total_duration|format_duration }}</div>
+            <div class="stat-label">Total Duration</div>
+        </div>
+    </div>
+
+    <div class="package-content">
+        <div class="jobs-section">
+            <div class="section-header">
+                <h2 class="section-title">Jobs in this Package</h2>
+                <a href="{% url 'managetime:job_create' %}" class="btn btn-primary">
+                    Add New Job
+                </a>
+            </div>
+
+            {% if jobs %}
+                <div class="table-container">
+                    <table class="jobs-table" role="table" aria-label="Jobs in package">
+                        <thead>
+                            <tr role="row">
+                                <th scope="col" role="columnheader">Job Title</th>
+                                <th scope="col" role="columnheader">Start Time</th>
+                                <th scope="col" role="columnheader">End Time</th>
+                                <th scope="col" role="columnheader">Duration</th>
+                                <th scope="col" role="columnheader">Status</th>
+                                <th scope="col" role="columnheader">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for job in jobs %}
+                                <tr role="row" class="{% if not job.end_time %}active-job{% endif %}">
+                                    <td role="cell">
+                                        <a href="{% url 'managetime:job_detail' job.id %}" class="job-title-link">
+                                            {{ job.title }}
+                                        </a>
+                                    </td>
+                                    <td role="cell">{{ job.start_time|date:"M d, Y H:i" }}</td>
+                                    <td role="cell">
+                                        {% if job.end_time %}
+                                            {{ job.end_time|date:"M d, Y H:i" }}
+                                        {% else %}
+                                            <span class="ongoing">Ongoing</span>
+                                        {% endif %}
+                                    </td>
+                                    <td role="cell">
+                                        <span class="duration">
+                                            {{ job.duration|format_duration }}
+                                        </span>
+                                    </td>
+                                    <td role="cell">
+                                        <span class="status-badge {% if job.is_completed %}completed{% else %}active{% endif %}">
+                                            {% if job.is_completed %}Completed{% else %}Active{% endif %}
+                                        </span>
+                                    </td>
+                                    <td role="cell" class="actions">
+                                        {% if not job.end_time %}
+                                            <button class="btn btn-sm btn-stop" 
+                                                    onclick="stopJob({{ job.id }})"
+                                                    aria-label="Stop job {{ job.title }}">
+                                                Stop
+                                            </button>
+                                        {% endif %}
+                                        <a href="{% url 'managetime:job_edit' job.id %}" 
+                                           class="btn btn-sm btn-edit" 
+                                           aria-label="Edit job {{ job.title }}">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h3>No jobs yet</h3>
+                    <p>This package doesn't have any jobs yet. <a href="{% url 'managetime:job_create' %}">Create your first job</a> to get started!</p>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Package Summary -->
+        <div class="package-summary">
+            <h3 class="summary-title">Package Summary</h3>
+            <div class="summary-content">
+                <div class="summary-item">
+                    <span class="summary-label">Package Name:</span>
+                    <span class="summary-value">{{ package.title }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Created:</span>
+                    <span class="summary-value">{{ package.created_at|date:"F d, Y" }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Last Updated:</span>
+                    <span class="summary-value">{{ package.updated_at|date:"F d, Y" }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Jobs:</span>
+                    <span class="summary-value">{{ jobs.count }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Duration:</span>
+                    <span class="summary-value duration-highlight">{{ package.total_duration|format_duration }}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Status:</span>
+                    <span class="summary-value">
+                        {% if package.is_active %}
+                            <span class="status-active">● Active</span>
+                        {% else %}
+                            <span class="status-inactive">● Inactive</span>
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.package-detail-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
+}
+
+.package-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-8);
+    padding: var(--spacing-6);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.package-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-4);
+}
+
+.package-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-6);
+    color: var(--gray-600);
+}
+
+.package-duration {
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+.package-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+.package-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-6);
+    margin-bottom: var(--spacing-8);
+}
+
+.package-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: var(--spacing-8);
+    align-items: start;
+}
+
+.jobs-section {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    overflow: hidden;
+}
+
+.package-summary {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--spacing-6);
+    height: fit-content;
+}
+
+.summary-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: var(--spacing-2);
+}
+
+.summary-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+.summary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.summary-item:last-child {
+    border-bottom: none;
+}
+
+.summary-label {
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.summary-value {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.duration-highlight {
+    color: var(--primary-color);
+    font-size: var(--font-size-lg);
+}
+
+.status-active {
+    color: var(--success-color);
+}
+
+.status-inactive {
+    color: var(--gray-400);
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: var(--spacing-4);
+}
+
+.empty-state h3 {
+    font-size: var(--font-size-xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-2);
+}
+
+.empty-state p {
+    color: var(--gray-600);
+    margin-bottom: var(--spacing-4);
+}
+
+.empty-state a {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.empty-state a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .package-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-4);
+    }
+    
+    .package-actions {
+        justify-content: center;
+    }
+    
+    .package-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .package-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 480px) {
+    .package-stats {
+        grid-template-columns: 1fr;
+    }
+    
+    .package-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-2);
+    }
+}
+</style>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
+{% load duration_filters %}
 
 {% block title %}Dashboard - Work Hours Tracker{% endblock %}
 
@@ -29,9 +30,15 @@
         <section class="jobs-section" aria-labelledby="jobs-heading">
             <div class="section-header">
                 <h2 id="jobs-heading" class="section-title">Recent Jobs</h2>
-                <a href="{% url 'managetime:job_create' %}" class="btn btn-primary" role="button">
-                    Add New Job
-                </a>
+                <div class="section-actions">
+                    <div class="search-container">
+                        <input type="text" id="job-search" class="search-input" placeholder="Search jobs..." aria-label="Search jobs">
+                        <button type="button" class="search-clear" id="search-clear" aria-label="Clear search" style="display: none;">&times;</button>
+                    </div>
+                    <a href="{% url 'managetime:job_create' %}" class="btn btn-primary" role="button">
+                        Add New Job
+                    </a>
+                </div>
             </div>
 
             {% if jobs %}
@@ -66,11 +73,7 @@
                                     </td>
                                     <td role="cell">
                                         <span class="duration">
-                                            {% if job.duration %}
-                                                {{ job.duration|floatformat:0 }}h
-                                            {% else %}
-                                                -
-                                            {% endif %}
+                                            {{ job.duration|format_duration }}
                                         </span>
                                     </td>
                                     <td role="cell">
@@ -162,7 +165,7 @@
                                         Created {{ package.created_at|date:"M d, Y" }}
                                     </p>
                                     <p class="package-duration">
-                                        Total: {{ package.total_duration|floatformat:0 }}h
+                                        Total: {{ package.total_duration|format_duration }}
                                     </p>
                                 </a>
                             </div>
@@ -180,29 +183,5 @@
 {% endblock %}
 
 {% block extra_js %}
-<script>
-function stopJob(jobId) {
-    if (confirm('Are you sure you want to stop this job?')) {
-        fetch(`/api/job/${jobId}/stop/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json',
-            },
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Error stopping job: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while stopping the job.');
-        });
-    }
-}
-</script>
+<!-- Enhanced functionality is handled by main.js -->
 {% endblock %}

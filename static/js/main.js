@@ -9,6 +9,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeForms();
     initializeQuickActions();
     initializeTooltips();
+    initializeSearch();
+    initializeAnimations();
 });
 
 /**
@@ -336,39 +338,6 @@ function showNotification(message, type = 'info') {
     }, 5000);
 }
 
-/**
- * Stop job functionality
- */
-function stopJob(jobId) {
-    if (!confirm('Are you sure you want to stop this job?')) {
-        return;
-    }
-    
-    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    
-    fetch(`/api/job/${jobId}/stop/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': csrfToken,
-            'Content-Type': 'application/json',
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            showNotification('Job stopped successfully!', 'success');
-            setTimeout(() => {
-                window.location.reload();
-            }, 1000);
-        } else {
-            showNotification('Error stopping job: ' + (data.message || 'Unknown error'), 'error');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        showNotification('An error occurred while stopping the job.', 'error');
-    });
-}
 
 /**
  * Format duration for display
@@ -413,6 +382,153 @@ function throttle(func, limit) {
             setTimeout(() => inThrottle = false, limit);
         }
     };
+}
+
+/**
+ * Initialize search functionality
+ */
+function initializeSearch() {
+    const searchInput = document.getElementById('job-search');
+    const searchClear = document.getElementById('search-clear');
+    const jobsTable = document.querySelector('.jobs-table tbody');
+    
+    if (!searchInput || !jobsTable) return;
+    
+    // Search functionality
+    searchInput.addEventListener('input', debounce(function() {
+        const searchTerm = this.value.toLowerCase().trim();
+        const rows = jobsTable.querySelectorAll('tr');
+        
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            const jobTitle = row.querySelector('.job-title-link')?.textContent.toLowerCase() || '';
+            const packageName = row.querySelector('.package-link')?.textContent.toLowerCase() || '';
+            const status = row.querySelector('.status-badge')?.textContent.toLowerCase() || '';
+            
+            const matches = jobTitle.includes(searchTerm) || 
+                          packageName.includes(searchTerm) || 
+                          status.includes(searchTerm);
+            
+            if (matches || searchTerm === '') {
+                row.style.display = '';
+                row.classList.add('fade-in');
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Show/hide clear button
+        if (searchTerm) {
+            searchClear.style.display = 'block';
+        } else {
+            searchClear.style.display = 'none';
+        }
+        
+        // Show no results message if needed
+        showNoResultsMessage(visibleCount === 0 && searchTerm !== '');
+    }, 300));
+    
+    // Clear search
+    searchClear.addEventListener('click', function() {
+        searchInput.value = '';
+        searchInput.dispatchEvent(new Event('input'));
+        searchInput.focus();
+    });
+}
+
+/**
+ * Show no results message
+ */
+function showNoResultsMessage(show) {
+    let noResultsMsg = document.getElementById('no-results-message');
+    
+    if (show && !noResultsMsg) {
+        noResultsMsg = document.createElement('tr');
+        noResultsMsg.id = 'no-results-message';
+        noResultsMsg.innerHTML = `
+            <td colspan="7" class="no-results">
+                <div class="empty-state">
+                    <p>No jobs found matching your search.</p>
+                </div>
+            </td>
+        `;
+        document.querySelector('.jobs-table tbody').appendChild(noResultsMsg);
+    } else if (!show && noResultsMsg) {
+        noResultsMsg.remove();
+    }
+}
+
+/**
+ * Initialize animations
+ */
+function initializeAnimations() {
+    // Add fade-in animation to cards
+    const cards = document.querySelectorAll('.stat-card, .package-item, .detail-card');
+    cards.forEach((card, index) => {
+        card.style.animationDelay = `${index * 0.1}s`;
+        card.classList.add('fade-in');
+    });
+    
+    // Add slide-in animation to table rows
+    const tableRows = document.querySelectorAll('.jobs-table tbody tr');
+    tableRows.forEach((row, index) => {
+        row.style.animationDelay = `${index * 0.05}s`;
+        row.classList.add('slide-in');
+    });
+}
+
+/**
+ * Enhanced stop job functionality with better UX
+ */
+function stopJob(jobId) {
+    if (!confirm('Are you sure you want to stop this job?')) {
+        return;
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    const stopButton = document.querySelector(`button[onclick="stopJob(${jobId})"]`);
+    
+    // Show loading state
+    if (stopButton) {
+        stopButton.disabled = true;
+        stopButton.innerHTML = '<span class="loading-spinner"></span> Stopping...';
+    }
+    
+    fetch(`/api/job/${jobId}/stop/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showNotification('Job stopped successfully!', 'success');
+            // Add a small delay before reloading for better UX
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        } else {
+            showNotification('Error stopping job: ' + (data.message || 'Unknown error'), 'error');
+            // Restore button state
+            if (stopButton) {
+                stopButton.disabled = false;
+                stopButton.innerHTML = 'Stop';
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('An error occurred while stopping the job.', 'error');
+        // Restore button state
+        if (stopButton) {
+            stopButton.disabled = false;
+            stopButton.innerHTML = 'Stop';
+        }
+    });
 }
 
 // Export functions for global use

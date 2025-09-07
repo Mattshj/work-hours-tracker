@@ -1,0 +1,281 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load duration_filters %}
+
+{% block title %}{{ job.title }} - Job Details{% endblock %}
+
+{% block content %}
+<div class="detail-container">
+    <div class="detail-header">
+        <div class="detail-title-section">
+            <h1 class="detail-title">{{ job.title }}</h1>
+            <div class="detail-meta">
+                <span class="status-badge {% if job.is_completed %}completed{% else %}active{% endif %}">
+                    {% if job.is_completed %}Completed{% else %}Active{% endif %}
+                </span>
+                {% if job.job_box %}
+                    <a href="{% url 'managetime:package_detail' job.job_box.id %}" class="package-link">
+                        {{ job.job_box.title }}
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="detail-actions">
+            {% if not job.end_time %}
+                <button class="btn btn-stop" onclick="stopJob({{ job.id }})">
+                    Stop Job
+                </button>
+            {% endif %}
+            <a href="{% url 'managetime:job_edit' job.id %}" class="btn btn-edit">
+                Edit Job
+            </a>
+            <a href="{% url 'managetime:home' %}" class="btn btn-secondary">
+                Back to Dashboard
+            </a>
+        </div>
+    </div>
+
+    <div class="detail-content">
+        <div class="detail-grid">
+            <!-- Time Information -->
+            <div class="detail-card">
+                <h3 class="card-title">Time Information</h3>
+                <div class="info-grid">
+                    <div class="info-item">
+                        <label>Start Time</label>
+                        <span class="info-value">{{ job.start_time|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="info-item">
+                        <label>End Time</label>
+                        <span class="info-value">
+                            {% if job.end_time %}
+                                {{ job.end_time|date:"M d, Y H:i" }}
+                            {% else %}
+                                <span class="ongoing">Ongoing</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <label>Duration</label>
+                        <span class="info-value duration-highlight">
+                            {{ job.duration|format_duration }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Job Statistics -->
+            <div class="detail-card">
+                <h3 class="card-title">Job Statistics</h3>
+                <div class="stats-mini">
+                    <div class="stat-item">
+                        <span class="stat-label">Created</span>
+                        <span class="stat-value">{{ job.created_at|date:"M d, Y" }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Last Updated</span>
+                        <span class="stat-value">{{ job.updated_at|date:"M d, Y H:i" }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Status</span>
+                        <span class="stat-value">
+                            {% if job.is_completed %}
+                                <span class="status-completed">✓ Completed</span>
+                            {% else %}
+                                <span class="status-active">● Active</span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Additional Actions -->
+        <div class="detail-actions-bottom">
+            <a href="{% url 'managetime:job_edit' job.id %}" class="btn btn-primary">
+                Edit Job Details
+            </a>
+            <a href="{% url 'managetime:job_delete' job.id %}" class="btn btn-danger" 
+               onclick="return confirm('Are you sure you want to delete this job? This action cannot be undone.')">
+                Delete Job
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.detail-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 var(--spacing-6);
+}
+
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-8);
+    padding: var(--spacing-6);
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+}
+
+.detail-title {
+    font-size: var(--font-size-3xl);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-4);
+}
+
+.detail-meta {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+}
+
+.detail-actions {
+    display: flex;
+    gap: var(--spacing-3);
+    flex-wrap: wrap;
+}
+
+.detail-content {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-6);
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--spacing-6);
+}
+
+.detail-card {
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid var(--gray-200);
+    padding: var(--spacing-6);
+}
+
+.card-title {
+    font-size: var(--font-size-lg);
+    font-weight: 600;
+    color: var(--gray-900);
+    margin-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--gray-200);
+    padding-bottom: var(--spacing-2);
+}
+
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-3);
+    background: var(--gray-50);
+    border-radius: var(--radius-md);
+}
+
+.info-item label {
+    font-weight: 500;
+    color: var(--gray-700);
+}
+
+.info-value {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.duration-highlight {
+    color: var(--primary-color);
+    font-size: var(--font-size-lg);
+}
+
+.stats-mini {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-2) 0;
+    border-bottom: 1px solid var(--gray-100);
+}
+
+.stat-item:last-child {
+    border-bottom: none;
+}
+
+.stat-label {
+    font-weight: 500;
+    color: var(--gray-600);
+}
+
+.stat-value {
+    font-weight: 600;
+    color: var(--gray-900);
+}
+
+.status-completed {
+    color: var(--success-color);
+}
+
+.status-active {
+    color: var(--info-color);
+}
+
+.detail-actions-bottom {
+    display: flex;
+    gap: var(--spacing-4);
+    justify-content: center;
+    padding: var(--spacing-6);
+    background: var(--gray-50);
+    border-radius: var(--radius-lg);
+}
+
+.btn-danger {
+    background: var(--error-color);
+    color: var(--white);
+    border-color: var(--error-color);
+}
+
+.btn-danger:hover:not(:disabled) {
+    background: #dc2626;
+    border-color: #dc2626;
+}
+
+@media (max-width: 768px) {
+    .detail-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-4);
+    }
+    
+    .detail-actions {
+        justify-content: center;
+    }
+    
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .detail-actions-bottom {
+        flex-direction: column;
+    }
+}
+</style>
+{% endblock %}
